@@ -8,27 +8,23 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"log"
 	"net/url"
 	"os"
 	"os/signal"
-	"time"
 	"strings"
+	"time"
 
-	"github.com/fasthttp/websocket"
 	"github.com/ashwanthkumar/slack-go-webhook"
+	"github.com/fasthttp/websocket"
 )
 
 func main() {
-	flag.Parse()
-	log.SetFlags(0)
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
 	key := os.Getenv("pb_key")
-	
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
 	log.Printf("connecting !")
@@ -117,8 +113,6 @@ type Push struct {
 	NotificationID   string `json:"notification_id"`
 	NotificationTag  string `json:"notification_tag"`
 }
-
-
 
 type Report struct {
 	Text       string
