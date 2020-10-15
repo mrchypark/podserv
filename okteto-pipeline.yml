@@ -1,5 +1,5 @@
 deploy:
-  - okteto build -t okteto.dev/dhpb:v0.0.3 -f pb/
+  - okteto build -t okteto.dev/dhpb:v0.0.4 -f pb/
   - okteto build -t okteto.dev/dhpod:v0.0.1 -f reply/
   - kubectl apply -f manifests/deployment.yml
   - kubectl apply -f manifests/cronjob.yml
