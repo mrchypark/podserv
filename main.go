@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"log"
 	"net/url"
@@ -45,7 +46,12 @@ func main() {
 				log.Println("read:", err)
 				return
 			}
-			log.Printf("recv: %s", message)
+			n, _ := UnmarshalNoti(message)
+
+			log.Printf("recv: %s", n.Push.PackageName)
+			log.Printf("recv: %s", n.Push.ApplicationName)
+			log.Printf("recv: %s", n.Push.Title)
+			log.Printf("recv: %s", n.Push.Body)
 		}
 	}()
 
@@ -79,4 +85,31 @@ func main() {
 			return
 		}
 	}
+}
+
+func UnmarshalNoti(data []byte) (Noti, error) {
+	var n Noti
+	err := json.Unmarshal(data, &n)
+	return n, err
+}
+
+type Noti struct {
+	Type    string   `json:"type"`
+	Targets []string `json:"targets"`
+	Push    Push     `json:"push"`
+}
+
+type Push struct {
+	Type             string `json:"type"`
+	SourceDeviceIden string `json:"source_device_iden"`
+	SourceUserIden   string `json:"source_user_iden"`
+	ClientVersion    int64  `json:"client_version"`
+	Dismissible      bool   `json:"dismissible"`
+	Icon             string `json:"icon"`
+	Title            string `json:"title"`
+	Body             string `json:"body"`
+	ApplicationName  string `json:"application_name"`
+	PackageName      string `json:"package_name"`
+	NotificationID   string `json:"notification_id"`
+	NotificationTag  string `json:"notification_tag"`
 }
