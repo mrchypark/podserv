@@ -16,6 +16,7 @@ import (
 	"time"
 
 	"github.com/fasthttp/websocket"
+	"github.com/ashwanthkumar/slack-go-webhook"
 )
 
 func main() {
@@ -26,6 +27,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt)
 
 	key := os.Getenv("pb_key")
+	
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
 	log.Printf("connecting !")
@@ -47,11 +49,11 @@ func main() {
 				return
 			}
 			n, _ := UnmarshalNoti(message)
-			if n.Type == "push" {
-				log.Printf("recv: %s", n.Push.PackageName)
-				log.Printf("recv: %s", n.Push.ApplicationName)
-				log.Printf("recv: %s", n.Push.Title)
-				log.Printf("recv: %s", n.Push.Body)
+			if n.Type == "push" && strings.Contains(n.Push.Body, "박*엽(4310)") {
+				log.Printf("app: %s", n.Push.ApplicationName)
+				log.Printf("title: %s", n.Push.Title)
+				log.Printf("body: %s", n.Push.Body)
+				Slack("알람이 왔습니다.", n)
 			}
 		}
 	}()
@@ -113,4 +115,33 @@ type Push struct {
 	PackageName      string `json:"package_name"`
 	NotificationID   string `json:"notification_id"`
 	NotificationTag  string `json:"notification_tag"`
+}
+
+
+
+type Report struct {
+	Text       string
+	Attachment slack.Attachment
+}
+
+func (r *Report) Send() {
+	webhookURL := os.Getenv("slack")
+	payload := slack.Payload{
+		Text:        r.Text,
+		Attachments: []slack.Attachment{r.Attachment},
+	}
+
+	err := slack.Send(webhookURL, "", payload)
+	if len(err) > 0 {
+		fmt.Printf("error: %s\n", err)
+	}
+}
+
+func Slack(text string, n Noti) {
+	nw := Report{Text: text}
+	nw.Attachment.
+		AddField(slack.Field{Title: "Title", Value: n.Push.Title}).
+		AddField(slack.Field{Title: "App", Value: n.Push.ApplicationName}).
+		AddField(slack.Field{Title: "Body", Value: n.Push.Body})
+	nw.Send()
 }

@@ -14,4 +14,4 @@ spec:
     spec:
       containers:
       - name: dhpb
-        image: okteto.dev/dhpb:v0.0.2
+        image: okteto.dev/dhpb:v0.0.3
