@@ -14,6 +14,7 @@ import (
 	"os"
 	"os/signal"
 	"time"
+	"strings"
 
 	"github.com/fasthttp/websocket"
 	"github.com/ashwanthkumar/slack-go-webhook"
@@ -133,7 +134,7 @@ func (r *Report) Send() {
 
 	err := slack.Send(webhookURL, "", payload)
 	if len(err) > 0 {
-		fmt.Printf("error: %s\n", err)
+		log.Printf("error: %s\n", err)
 	}
 }
 
