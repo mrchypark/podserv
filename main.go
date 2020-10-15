@@ -27,7 +27,7 @@ func main() {
 	key := os.Getenv("pb_key")
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
-	log.Printf("connecting to %s", u.String())
+	log.Printf("connecting")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
