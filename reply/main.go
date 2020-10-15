@@ -7,15 +7,31 @@ import (
 	"time"
 
 	"github.com/ashwanthkumar/slack-go-webhook"
+	"github.com/robfig/cron/v3"
 	"github.com/valyala/fasthttp"
 )
 
 func main() {
+	c := cron.New()
+
+	c.AddJob("@every 30s", diff{})
+
+	c.Start()
+
+	for {
+		time.Sleep(time.Second)
+	}
+}
+
+type diff struct {
+}
+
+func (f diff) Run() {
 	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies,votes,summary&offset=0&next=0")
 	s, _ := UnmarshalReply(res)
 	p := s.Summary.TotalCount
 	println("pre reply count: ", p)
-	time.Sleep(time.Second * 150)
+	time.Sleep(time.Second * 60)
 	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies,votes,summary&offset=0&next=0")
 	s, _ = UnmarshalReply(res)
 	n := s.Summary.TotalCount

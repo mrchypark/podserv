@@ -15,3 +15,21 @@ spec:
       containers:
       - name: dhpb
         image: okteto.dev/dhpb:v0.0.4
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dhpod
+spec:
+  selector:
+    matchLabels:
+      app: dhpod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dhpod
+    spec:
+      containers:
+      - name: dhpod
+        image: okteto.dev/dhpod:v0.0.2
