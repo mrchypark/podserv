@@ -28,7 +28,7 @@ func main() {
 	key := os.Getenv("pb_key")
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
-	log.Printf("connecting")
+	log.Printf("connecting !")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
@@ -47,11 +47,12 @@ func main() {
 				return
 			}
 			n, _ := UnmarshalNoti(message)
-
-			log.Printf("recv: %s", n.Push.PackageName)
-			log.Printf("recv: %s", n.Push.ApplicationName)
-			log.Printf("recv: %s", n.Push.Title)
-			log.Printf("recv: %s", n.Push.Body)
+			if n.Type == "push" {
+				log.Printf("recv: %s", n.Push.PackageName)
+				log.Printf("recv: %s", n.Push.ApplicationName)
+				log.Printf("recv: %s", n.Push.Title)
+				log.Printf("recv: %s", n.Push.Body)
+			}
 		}
 	}()
 
