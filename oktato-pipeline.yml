@@ -1,0 +1,3 @@
+deploy:
+  - okteto build -t okteto.dev/dhpb:latest
+  - kubectl apply -f manifests/deployment.yml

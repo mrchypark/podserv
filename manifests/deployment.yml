@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dhpb
+spec:
+  selector:
+    matchLabels:
+      app: dhpb
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dhpb
+    spec:
+      containers:
+      - name: dhpb
+        image: okteto.dev/dhpb:latest
+        ports:
+        - containerPort: 8080
