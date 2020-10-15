@@ -33,3 +33,21 @@ spec:
       containers:
       - name: dhpod
         image: okteto.dev/dhpod:v0.0.2
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dhsub
+spec:
+  selector:
+    matchLabels:
+      app: dhsub
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: dhsub
+    spec:
+      containers:
+      - name: dhsub
+        image: okteto.dev/dhsub:v0.0.1

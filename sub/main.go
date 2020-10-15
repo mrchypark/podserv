@@ -6,8 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/PuerkitoBio/goquery"
 	"github.com/ashwanthkumar/slack-go-webhook"
-	"github.com/robfig/cron/v3"
+	"github.com/robfig/cron"
 	"github.com/valyala/fasthttp"
 )
 
@@ -27,20 +28,35 @@ type diff struct {
 }
 
 func (f diff) Run() {
-	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies&offset=0&next=0")
-	s, _ := UnmarshalReply(res)
-	p := s.Summary.TotalCount
-	println("pre reply count: ", p)
+
+	doc, err := goquery.NewDocument("http://www.podbbang.com/ch/1771386")
+	if err != nil {
+		log.Fatal(err)
+	}
+	pl := doc.Find("dl.likes dd").Text()
+	ps := doc.Find("dl.subscribes dd").Text()
+	println("pre like:", pl)
+	println("pre sub:", ps)
 	time.Sleep(time.Second * 60)
-	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies&offset=0&next=0")
-	s, _ = UnmarshalReply(res)
-	n := s.Summary.TotalCount
-	println("now reply count: ", n)
-	if p != n {
-		Slack("댓글에 변경이 발생했습니다.")
+	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
+	if err != nil {
+		log.Fatal(err)
+	}
+	nl := doc.Find("dl.likes dd").Text()
+	ns := doc.Find("dl.subscribes dd").Text()
+	println("now like:", nl)
+	println("now sub:", ns)
+	if pl != nl {
+		SlackLike("좋아요 수가 달라졌습니다.", nl)
 		println("diff!")
 	} else {
-		println("no diff")
+		println("no diff like")
+	}
+	if ps != ns {
+		SlackLike("구독 수가 달라졌습니다.", ns)
+		println("diff!")
+	} else {
+		println("no diff sub")
 	}
 }
 
@@ -89,7 +105,16 @@ func (r *Report) Send() {
 	}
 }
 
-func Slack(text string) {
+func SlackLike(text string, like string) {
 	nw := Report{Text: text}
+	nw.Attachment.
+		AddField(slack.Field{Title: "좋아요", Value: like})
+	nw.Send()
+}
+
+func SlackSub(text string, sub string) {
+	nw := Report{Text: text}
+	nw.Attachment.
+		AddField(slack.Field{Title: "구독", Value: sub})
 	nw.Send()
 }
