@@ -14,23 +14,28 @@ jobs:
       uses: okteto/login@master
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
+        
+    - name: "Activate personal namespace"
+      uses: okteto/namespace@master
+      with:
+        name: mrchypark
+
     - name: Deploy Application
       uses: okteto/apply@master
       with:
-        namespace: mrchypark
         manifest: manifests/deployment.yml
 
-    - name: Push API Changes
+    - name: Push pb Changes
       uses: okteto/push@master
       with:
         working-directory: pb
 
-    - name: Push Frontend Changes
+    - name: Push reply Changes
       uses: okteto/push@master
       with:
         working-directory: reply
         
-    - name: Push Frontend Changes
+    - name: Push sub Changes
       uses: okteto/push@master
       with:
         working-directory: sub
