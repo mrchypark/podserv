@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -39,8 +40,8 @@ func (f diff) Run() {
 	ps := doc.Find("dl.subscribes dd").Text()
 	pls := strings.Split(pl, "{{")
 	pss := strings.Split(ps, "{{")
-	println("pre like:", pls[0])
-	println("pre sub:", pss[0])
+	fmt.Println("pre like:", pls[0])
+	fmt.Println("pre sub:", pss[0])
 	time.Sleep(time.Second * 35)
 	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
 	if err != nil {
@@ -51,19 +52,19 @@ func (f diff) Run() {
 	ns := doc.Find("dl.subscribes dd").Text()
 	nls := strings.Split(nl, "{{")
 	nss := strings.Split(ns, "{{")
-	println("pre like:", nls[0])
-	println("pre sub:", nss[0])
+	fmt.Println("pre like:", nls[0])
+	fmt.Println("pre sub:", nss[0])
 	if pls[0] != nls[0] {
 		SlackLike("좋아요 수가 달라졌습니다.", pls[0]+"->"+nls[0])
-		println("diff!")
+		fmt.Println("diff!")
 	} else {
-		println("no diff like")
+		fmt.Println("no diff like")
 	}
 	if pss[0] != nss[0] {
 		SlackLike("구독 수가 달라졌습니다.", pss[0]+"->"+nss[0])
-		println("diff!")
+		fmt.Println("diff!")
 	} else {
-		println("no diff sub")
+		fmt.Println("no diff sub")
 	}
 }
 
