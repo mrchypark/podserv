@@ -20,23 +20,8 @@ jobs:
       with:
         name: mrchypark
 
-    - name: Deploy Application
-      uses: okteto/apply@master
+    - name: "Trigger the pipeline"
+      uses: okteto/pipeline@master
       with:
-        manifest: manifests/deployment.yml
-
-    - name: Push pb Changes
-      uses: okteto/push@master
-      with:
-        working-directory: pb
-
-    - name: Push reply Changes
-      uses: okteto/push@master
-      with:
-        working-directory: reply
-        
-    - name: Push sub Changes
-      uses: okteto/push@master
-      with:
-        working-directory: sub
+        name: podserv
 
