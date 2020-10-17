@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -30,17 +31,17 @@ func (f diff) Run() {
 	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ := UnmarshalReply(res)
 	p := s.Summary.TotalCount
-	println("pre reply count: ", p)
+	fmt.Println("pre reply count: ", p)
 	time.Sleep(time.Second * 31)
 	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ = UnmarshalReply(res)
 	n := s.Summary.TotalCount
-	println("now reply count: ", n)
+	fmt.Println("now reply count: ", n)
 	if p != n {
 		Slack("댓글에 변경이 발생했습니다.")
-		println("diff!")
+		fmt.Println("diff!")
 	} else {
-		println("no diff")
+		fmt.Println("no diff")
 	}
 }
 
