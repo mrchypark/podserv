@@ -14,18 +14,7 @@ spec:
     spec:
       containers:
       - name: dhpb
-        image: dhpb
-        env: 
-          - name: pb_key
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: pb_key
-          - name: slack
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: slack
+        image: okteto.dev/dhpb:v0.0.5
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -43,18 +32,7 @@ spec:
     spec:
       containers:
       - name: dhreply
-        image: dhreply
-        env: 
-          - name: pb_key
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: pb_key
-          - name: slack
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: slack
+        image: okteto.dev/dhpod:v0.0.3
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -72,15 +50,4 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: dhsub
-        env: 
-          - name: pb_key
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: pb_key
-          - name: slack
-            valueFrom:
-              secretKeyRef:
-                name: podsecret
-                key: slack
+        image: okteto.dev/dhsub:v0.0.2
