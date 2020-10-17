@@ -14,25 +14,25 @@ spec:
     spec:
       containers:
       - name: dhpb
-        image: okteto.dev/dhpb:v0.0.4
+        image: dhpb
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dhpod
+  name: dhreply
 spec:
   selector:
     matchLabels:
-      app: dhpod
+      app: dhreply
   replicas: 1
   template:
     metadata:
       labels:
-        app: dhpod
+        app: dhreply
     spec:
       containers:
-      - name: dhpod
-        image: okteto.dev/dhpod:v0.0.2
+      - name: dhreply
+        image: dhreply
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,4 +50,4 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: okteto.dev/dhsub:v0.0.1
+        image: dhsub

@@ -32,15 +32,17 @@ func (f diff) Run() {
 	doc, err := goquery.NewDocument("http://www.podbbang.com/ch/1771386")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	pl := doc.Find("dl.likes dd").Text()
 	ps := doc.Find("dl.subscribes dd").Text()
 	println("pre like:", pl)
 	println("pre sub:", ps)
-	time.Sleep(time.Second * 60)
+	time.Sleep(time.Second * 35)
 	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 	nl := doc.Find("dl.likes dd").Text()
 	ns := doc.Find("dl.subscribes dd").Text()

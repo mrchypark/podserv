@@ -1,0 +1,16 @@
+apiVersion: skaffold/v2beta7
+kind: Config
+metadata:
+  name: podserv
+build:
+  artifacts:
+  - image: dhpb
+    context: pb
+  - image: dhreply
+    context: reply
+  - image: dhsub
+    context: sub
+deploy:
+  kubectl:
+    manifests:
+    - manifests/deployment.yml
