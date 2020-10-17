@@ -7,7 +7,7 @@ RUN go mod download
 COPY . .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -ldflags '-w -s' -o pod main.go
 
-FROM gcr.io/distroless/static-debian10
+FROM debian:buster-slim
 EXPOSE 3000
 COPY --from=build /app/pod /
 CMD ["/pod"]
