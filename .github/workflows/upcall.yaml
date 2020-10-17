@@ -18,7 +18,7 @@ jobs:
       uses: okteto/apply@master
       with:
         namespace: mrchypark
-        manifest: manifests
+        manifest: manifests/deployment.yml
 
     - name: Push API Changes
       uses: okteto/push@master
