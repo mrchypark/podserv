@@ -19,12 +19,12 @@ spec:
           - name: pb_key
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: pb_key
           - name: slack
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: slack
 ---
 apiVersion: apps/v1
@@ -48,12 +48,12 @@ spec:
           - name: pb_key
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: pb_key
           - name: slack
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: slack
 ---
 apiVersion: apps/v1
@@ -77,10 +77,10 @@ spec:
           - name: pb_key
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: pb_key
           - name: slack
             valueFrom:
               secretKeyRef:
-                name: PODSECRET
+                name: podsecret
                 key: slack
