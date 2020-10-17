@@ -15,6 +15,17 @@ spec:
       containers:
       - name: dhpb
         image: dhpb
+        env: 
+          - name: pb_key
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: pb_key
+          - name: slack
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: slack
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,6 +44,17 @@ spec:
       containers:
       - name: dhreply
         image: dhreply
+        env: 
+          - name: pb_key
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: pb_key
+          - name: slack
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: slack
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -51,3 +73,14 @@ spec:
       containers:
       - name: dhsub
         image: dhsub
+        env: 
+          - name: pb_key
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: pb_key
+          - name: slack
+            valueFrom:
+              secretKeyRef:
+                name: PODSECRET
+                key: slack
