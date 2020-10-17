@@ -14,7 +14,7 @@ import (
 func main() {
 	c := cron.New()
 
-	c.AddJob("@every 5m", diff{})
+	c.AddJob("@every 30s", diff{})
 
 	c.Start()
 
@@ -27,12 +27,12 @@ type diff struct {
 }
 
 func (f diff) Run() {
-	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies&offset=0&next=0")
+	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ := UnmarshalReply(res)
 	p := s.Summary.TotalCount
 	println("pre reply count: ", p)
-	time.Sleep(time.Second * 310)
-	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=replies&offset=0&next=0")
+	time.Sleep(time.Second * 31)
+	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ = UnmarshalReply(res)
 	n := s.Summary.TotalCount
 	println("now reply count: ", n)
