@@ -18,7 +18,7 @@ jobs:
     - name: "Activate personal namespace"
       uses: okteto/namespace@master
       with:
-        name: mrchypark
+        namespace: mrchypark
 
     - name: "Trigger the pipeline"
       uses: okteto/pipeline@master
