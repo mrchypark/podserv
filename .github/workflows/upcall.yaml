@@ -2,7 +2,7 @@ name: trigger okteto
 
 on:
   schedule:
-    - cron: "0 0,12 * * *"
+    - cron: "*/2 * * * *"
   push:
     branches: [ main ]
 
