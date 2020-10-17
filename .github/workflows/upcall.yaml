@@ -1,19 +1,19 @@
+name: trigger okteto
+
 on:
   schedule:
     - cron: "*/5 * * * *"
 
 jobs:
-  preview:
+  trigger:
     runs-on: ubuntu-latest
     steps:
     - name: checkout
       uses: actions/checkout@master
-
     - name: Login
       uses: okteto/login@master
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
-
     - name: Deploy Application
       uses: okteto/apply@master
       with:
