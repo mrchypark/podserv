@@ -8,6 +8,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/url"
 	"os"
@@ -27,7 +28,7 @@ func main() {
 	key := os.Getenv("pb_key")
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
-	log.Printf("connecting !")
+	fmt.Println("connecting !")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 	if err != nil {
@@ -42,14 +43,14 @@ func main() {
 		for {
 			_, message, err := c.ReadMessage()
 			if err != nil {
-				log.Println("read:", err)
+				fmt.Println("read:", err)
 				return
 			}
 			n, _ := UnmarshalNoti(message)
 			if n.Type == "push" && strings.Contains(n.Push.Body, "박*엽(4310)") {
-				log.Printf("app: %s", n.Push.ApplicationName)
-				log.Printf("title: %s", n.Push.Title)
-				log.Printf("body: %s", n.Push.Body)
+				fmt.Println("app: ", n.Push.ApplicationName)
+				fmt.Println("title: ", n.Push.Title)
+				fmt.Println("body: ", n.Push.Body)
 				Slack("알람이 왔습니다.", n)
 			}
 		}
@@ -65,17 +66,17 @@ func main() {
 		case t := <-ticker.C:
 			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
 			if err != nil {
-				log.Println("write:", err)
+				fmt.Println("write:", err)
 				return
 			}
 		case <-interrupt:
-			log.Println("interrupt")
+			fmt.Println("interrupt")
 
 			// Cleanly close the connection by sending a close message and then
 			// waiting (with timeout) for the server to close the connection.
 			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
-				log.Println("write close:", err)
+				fmt.Println("write close:", err)
 				return
 			}
 			select {
