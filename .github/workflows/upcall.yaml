@@ -2,7 +2,7 @@ name: trigger okteto
 
 on:
   schedule:
-    - cron: "*/5 * * * *"
+    - cron: "* * * * *"
 
 jobs:
   trigger:
