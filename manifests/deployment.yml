@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: dhreply
-        image: okteto.dev/dhpod:v0.1.0
+        image: okteto.dev/dhpod:v0.1.1
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -50,4 +50,4 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: okteto.dev/dhsub:v0.1.0
+        image: okteto.dev/dhsub:v0.1.1
