@@ -1,0 +1,29 @@
+name: trigger okteto
+
+on:
+  schedule:
+    - cron: "0 0,12 * * *"
+  push:
+    branches: [ main ]
+
+jobs:
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout
+      uses: actions/checkout@master
+    - name: Login
+      uses: okteto/login@master
+      with:
+        token: ${{ secrets.OKTETO_TOKEN }}
+        
+    - name: "Activate personal namespace"
+      uses: okteto/namespace@master
+      with:
+        namespace: mrchypark
+
+    - name: "Trigger the pipeline"
+      uses: okteto/pipeline@master
+      with:
+        name: podserv
+
