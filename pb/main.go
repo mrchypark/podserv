@@ -26,6 +26,7 @@ func main() {
 	signal.Notify(interrupt, os.Interrupt)
 
 	key := os.Getenv("pb_key")
+	str := os.Getenv("filter_str")
 
 	u := url.URL{Scheme: "wss", Host: "stream.pushbullet.com", Path: "/websocket/" + key}
 	fmt.Println("connecting !")
@@ -47,7 +48,7 @@ func main() {
 				return
 			}
 			n, _ := UnmarshalNoti(message)
-			if n.Type == "push" && strings.Contains(n.Push.Body, "박*엽(4310)") {
+			if n.Type == "push" && strings.Contains(n.Push.Body, str) {
 				fmt.Println("app: ", n.Push.ApplicationName)
 				fmt.Println("title: ", n.Push.Title)
 				fmt.Println("body: ", n.Push.Body)
