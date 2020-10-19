@@ -32,13 +32,13 @@ func (f diff) Run() {
 	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ := UnmarshalReply(res)
 	p := s.Summary.TotalCount
-	spew.Printf("pre res: %#v", s)
+	spew.Printf("pre res: %#v\n", s)
 	fmt.Println("pre reply count: ", p)
 	time.Sleep(time.Second * 31)
 	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ = UnmarshalReply(res)
 	n := s.Summary.TotalCount
-	spew.Printf("now res: %#v", n)
+	spew.Printf("now res: %#v\n", n)
 	fmt.Println("now reply count: ", n)
 	if p != n {
 		Slack("댓글에 변경이 발생했습니다.")
