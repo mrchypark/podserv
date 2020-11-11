@@ -50,4 +50,4 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: okteto.dev/dhsub:v0.1.2
+        image: okteto.dev/dhsub:v0.1.3

@@ -48,6 +48,12 @@ func (f diff) Run() {
 	if pss[0] == "0" {
 		return
 	}
+	if pls[0] == "" {
+		return
+	}
+	if pss[0] == "" {
+		return
+	}
 	time.Sleep(time.Second * 31)
 	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
 	if err != nil {
