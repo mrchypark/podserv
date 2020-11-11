@@ -32,6 +32,11 @@ func (f diff) Run() {
 	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ := UnmarshalReply(res)
 	p := s.Summary.TotalCount
+
+	if p == 0 {
+		return
+	}
+
 	spew.Printf("pre res: %#v\n", s)
 	fmt.Println("pre reply count: ", p)
 	time.Sleep(time.Second * 31)
@@ -63,7 +68,6 @@ func doRequest(url string) []byte {
 	req.SetRequestURI(url)
 
 	fasthttp.Do(req, resp)
-
 	return resp.Body()
 }
 

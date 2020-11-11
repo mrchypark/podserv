@@ -42,7 +42,13 @@ func (f diff) Run() {
 	pss := strings.Split(ps, "{{")
 	fmt.Println("pre like:", pls[0])
 	fmt.Println("pre sub:", pss[0])
-	time.Sleep(time.Second * 35)
+	if pls[0] == "0" {
+		return
+	}
+	if pss[0] == "0" {
+		return
+	}
+	time.Sleep(time.Second * 31)
 	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
 	if err != nil {
 		log.Fatal(err)
