@@ -66,6 +66,21 @@ func (f diff) Run() {
 	nss := strings.Split(ns, "{{")
 	fmt.Println("pre like:", nls[0])
 	fmt.Println("pre sub:", nss[0])
+
+	if nls[0] == "0" {
+		return
+	}
+	if nss[0] == "0" {
+		return
+	}
+	if nls[0] == "" {
+		return
+	}
+	if nss[0] == "" {
+		return
+	}
+
+
 	if pls[0] != nls[0] {
 		SlackLike("좋아요 수가 달라졌습니다.", pls[0]+"->"+nls[0])
 		fmt.Println("diff!")

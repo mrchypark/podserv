@@ -43,6 +43,9 @@ func (f diff) Run() {
 	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
 	s, _ = UnmarshalReply(res)
 	n := s.Summary.TotalCount
+	if n == 0 {
+		return
+	}
 	spew.Printf("now res: %#v\n", s)
 	fmt.Println("now reply count: ", n)
 	if p != n {
