@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: dhpb
-        image: okteto.dev/dhpb:v0.1.1
+        image: okteto.dev/dhpb:v0.1.2
 ---
 apiVersion: apps/v1
 kind: Deployment
