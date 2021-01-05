@@ -122,7 +122,7 @@ type Report struct {
 }
 
 func (r *Report) Send() {
-	webhookURL := os.Getenv("slack")
+	webhookURL := os.Getenv("slack_money")
 	payload := slack.Payload{
 		Text:        r.Text,
 		Attachments: []slack.Attachment{r.Attachment},
