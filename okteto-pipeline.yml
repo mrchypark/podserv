@@ -1,5 +1,5 @@
 deploy:
   - okteto build -t okteto.dev/dhpb:v0.1.2 -f pb/Dockerfile ./pb/
-  - okteto build -t okteto.dev/dhpod:v0.1.6 -f reply/Dockerfile ./reply/
+  - okteto build -t okteto.dev/dhpod:v0.1.7 -f reply/Dockerfile ./reply/
   - okteto build -t okteto.dev/dhsub:v0.1.4 -f sub/Dockerfile ./sub/
   - kubectl apply -f manifests/deployment.yml

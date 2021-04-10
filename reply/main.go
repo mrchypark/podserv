@@ -5,21 +5,25 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/ashwanthkumar/slack-go-webhook"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/robfig/cron/v3"
 	"github.com/valyala/fasthttp"
-	"github.com/davecgh/go-spew/spew"
+)
+
+var (
+	webhookURL = getEnvVar("slack", "")
 )
 
 func main() {
 	c := cron.New()
-
+	fmt.Println("set webhook url is:")
+	fmt.Println(webhookURL)
 	c.AddJob("@every 30s", diff{})
-
 	c.Start()
-
 	for {
 		time.Sleep(time.Second)
 	}
@@ -88,7 +92,6 @@ type Report struct {
 }
 
 func (r *Report) Send() {
-	webhookURL := os.Getenv("slack")
 	payload := slack.Payload{
 		Text:        r.Text,
 		Attachments: []slack.Attachment{r.Attachment},
@@ -103,4 +106,11 @@ func (r *Report) Send() {
 func Slack(text string) {
 	nw := Report{Text: text}
 	nw.Send()
+}
+
+func getEnvVar(key, fallbackValue string) string {
+	if val, ok := os.LookupEnv(key); ok {
+		return strings.TrimSpace(val)
+	}
+	return fallbackValue
 }
