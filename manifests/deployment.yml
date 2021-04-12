@@ -15,6 +15,9 @@ spec:
       containers:
       - name: dhpb
         image: okteto.dev/dhpb:v0.1.2
+        envFrom:
+        - configMapRef:
+            name: configs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -33,6 +36,9 @@ spec:
       containers:
       - name: dhreply
         image: okteto.dev/dhpod:v0.1.7
+        envFrom:
+        - configMapRef:
+            name: configs
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -51,3 +57,6 @@ spec:
       containers:
       - name: dhsub
         image: okteto.dev/dhsub:v0.1.4
+        envFrom:
+        - configMapRef:
+            name: configs
