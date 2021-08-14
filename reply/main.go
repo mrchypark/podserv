@@ -33,21 +33,20 @@ type diff struct {
 }
 
 func (f diff) Run() {
-	res := doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
-	s, _ := UnmarshalReply(res)
+	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
+	s, _ := UnmarshalComment(res)
 	p := s.Summary.TotalCount
-
-	if p == 0 {
+	if *p == int64(0) {
 		return
 	}
 
 	spew.Printf("pre res: %#v\n", s)
 	fmt.Println("pre reply count: ", p)
 	time.Sleep(time.Second * 31)
-	res = doRequest("http://www.podbbang.com/_m_api/podcasts/1771386/comments?with=summary&offset=0&next=0")
-	s, _ = UnmarshalReply(res)
+	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
+	s, _ = UnmarshalComment(res)
 	n := s.Summary.TotalCount
-	if n == 0 {
+	if *n == int64(0) {
 		return
 	}
 	spew.Printf("now res: %#v\n", s)
@@ -60,17 +59,11 @@ func (f diff) Run() {
 	}
 }
 
-func UnmarshalReply(data []byte) (Reply, error) {
-	var r Reply
-	err := json.Unmarshal(data, &r)
-	return r, err
-}
-
 func doRequest(url string) []byte {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)   // <- do not forget to release
-	defer fasthttp.ReleaseResponse(resp) // <- do not forget to release
+	defer fasthttp.ReleaseRequest(req)
+	defer fasthttp.ReleaseResponse(resp)
 
 	req.SetRequestURI(url)
 
@@ -78,12 +71,61 @@ func doRequest(url string) []byte {
 	return resp.Body()
 }
 
-type Reply struct {
-	Summary Summary `json:"summary"`
+// This file was generated from JSON Schema using quicktype, do not modify it directly.
+// To parse and unparse this JSON data, add this code to your project and do:
+//
+//    comment, err := UnmarshalComment(bytes)
+//    bytes, err = comment.Marshal()
+
+func UnmarshalComment(data []byte) (Comment, error) {
+	var r Comment
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *Comment) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+type Comment struct {
+	Data    []Datum  `json:"data,omitempty"`
+	Next    *string  `json:"next,omitempty"`
+	Summary *Summary `json:"summary,omitempty"`
+}
+
+type Datum struct {
+	ID         *int64      `json:"id,omitempty"`
+	Channel    *Channel    `json:"channel,omitempty"`
+	User       *User       `json:"user,omitempty"`
+	Support    interface{} `json:"support"`
+	Parent     interface{} `json:"parent"`
+	State      *string     `json:"state,omitempty"`
+	Message    *string     `json:"message,omitempty"`
+	Image      *string     `json:"image,omitempty"`
+	BgColor    *string     `json:"bgColor,omitempty"`
+	CreatedAt  *string     `json:"createdAt,omitempty"`
+	ReplyCount *int64      `json:"replyCount,omitempty"`
+	Episode    *Channel    `json:"episode,omitempty"`
+	CanBlind   *bool       `json:"canBlind,omitempty"`
+	CanDelete  *bool       `json:"canDelete,omitempty"`
+	CanEdit    *bool       `json:"canEdit,omitempty"`
+	CanReport  *bool       `json:"canReport,omitempty"`
+}
+
+type Channel struct {
+	ID *int64 `json:"id,omitempty"`
+}
+
+type User struct {
+	ID           *int64  `json:"id,omitempty"`
+	Picture      *string `json:"picture,omitempty"`
+	PictureColor *string `json:"pictureColor,omitempty"`
+	Nickname     *string `json:"nickname,omitempty"`
+	Role         *string `json:"role,omitempty"`
 }
 
 type Summary struct {
-	TotalCount int64 `json:"total_count"`
+	TotalCount *int64 `json:"totalCount,omitempty"`
 }
 
 type Report struct {
