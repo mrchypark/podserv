@@ -35,7 +35,11 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
-		Slack("파싱에 문제가 발생했습니다.")
+		pd := Slack{
+			Text:    "파싱에 문제가 발생했습니다.",
+			Rawbody: string(res),
+		}
+		pd.errReport()
 	}
 	plc := s.Channels.Data[0].LikeCount
 	psc := s.Channels.Data[0].SubscribeCount
@@ -47,7 +51,11 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
-		Slack("파싱에 문제가 발생했습니다.")
+		pd := Slack{
+			Text:    "파싱에 문제가 발생했습니다.",
+			Rawbody: string(res),
+		}
+		pd.errReport()
 	}
 	lc := s.Channels.Data[0].LikeCount
 	sc := s.Channels.Data[0].SubscribeCount
@@ -55,18 +63,19 @@ func (f diff) Run() {
 	fmt.Println("pre like count: ", *lc)
 	fmt.Println("pre subscribe count: ", *sc)
 
-	if *plc != *lc {
-		SlackLike("좋아요 수에 변경이 발생했습니다.", lc)
-		fmt.Println("like count diff!")
-	} else {
-		fmt.Println("like count no diff")
+	pd := Slack{
+		Text:         "팟빵에 변경이 발생했습니다.",
+		PreLike:      plc,
+		Like:         lc,
+		PreSubscribe: psc,
+		Subscribe:    sc,
 	}
 
-	if *psc != *sc {
-		SlackSub("구독 수에 변경이 발생했습니다.", sc)
-		fmt.Println("like count diff!")
+	if *plc != *lc || *psc != *sc {
+		pd.report()
+		fmt.Println("count diff!")
 	} else {
-		fmt.Println("like count no diff")
+		fmt.Println("count no diff")
 	}
 }
 
@@ -100,23 +109,30 @@ func (r *Report) Send() {
 	}
 }
 
-func Slack(text string) {
-	nw := Report{Text: text}
+func (s *Slack) report() {
+	nw := Report{Text: s.Text}
+	nw.Attachment.
+		AddField(slack.Field{Title: "이전구독", Value: fmt.Sprintf("%v", *s.PreSubscribe)}).
+		AddField(slack.Field{Title: "구독", Value: fmt.Sprintf("%v", *s.Subscribe)}).
+		AddField(slack.Field{Title: "이전좋아요", Value: fmt.Sprintf("%v", *s.PreLike)}).
+		AddField(slack.Field{Title: "좋아요", Value: fmt.Sprintf("%v", *s.Like)})
 	nw.Send()
 }
 
-func SlackLike(text string, like *int) {
-	nw := Report{Text: text}
+func (s *Slack) errReport() {
+	nw := Report{Text: s.Text}
 	nw.Attachment.
-		AddField(slack.Field{Title: "좋아요", Value: fmt.Sprintf("%v", *like)})
+		AddField(slack.Field{Title: "api 응답", Value: s.Rawbody})
 	nw.Send()
 }
 
-func SlackSub(text string, sub *int) {
-	nw := Report{Text: text}
-	nw.Attachment.
-		AddField(slack.Field{Title: "구독", Value: fmt.Sprintf("%v", *sub)})
-	nw.Send()
+type Slack struct {
+	Text         string
+	PreLike      *int
+	Like         *int
+	PreSubscribe *int
+	Subscribe    *int
+	Rawbody      string
 }
 
 func UnmarshalChannelInfo(data []byte) (ChannelInfo, error) {

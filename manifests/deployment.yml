@@ -56,7 +56,7 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: okteto.dev/dhsub:v0.2.0
+        image: okteto.dev/dhsub:v0.2.1
         envFrom:
         - configMapRef:
             name: configs
