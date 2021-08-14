@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/ashwanthkumar/slack-go-webhook"
-	"github.com/davecgh/go-spew/spew"
 	"github.com/robfig/cron/v3"
 	"github.com/valyala/fasthttp"
 )
@@ -34,23 +33,28 @@ type diff struct {
 
 func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
-	s, _ := UnmarshalComment(res)
+	s, err := UnmarshalComment(res)
+	if err != nil {
+		Slack("파싱에 문제가 발생했습니다.")
+	}
 	p := s.Summary.TotalCount
-	if *p == int64(0) {
+	if *p == int(0) {
 		return
 	}
 
-	spew.Printf("pre res: %#v\n", s)
-	fmt.Println("pre reply count: ", p)
+	fmt.Println("pre reply count: ", *p)
 	time.Sleep(time.Second * 31)
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
-	s, _ = UnmarshalComment(res)
+	s, err = UnmarshalComment(res)
+	if err != nil {
+		Slack("파싱에 문제가 발생했습니다.")
+	}
 	n := s.Summary.TotalCount
-	if *n == int64(0) {
+	if *n == int(0) {
 		return
 	}
-	spew.Printf("now res: %#v\n", s)
-	fmt.Println("now reply count: ", n)
+
+	fmt.Println("now reply count: ", *n)
 	if *p != *n {
 		Slack("댓글에 변경이 발생했습니다.")
 		fmt.Println("diff!")
@@ -71,12 +75,6 @@ func doRequest(url string) []byte {
 	return resp.Body()
 }
 
-// This file was generated from JSON Schema using quicktype, do not modify it directly.
-// To parse and unparse this JSON data, add this code to your project and do:
-//
-//    comment, err := UnmarshalComment(bytes)
-//    bytes, err = comment.Marshal()
-
 func UnmarshalComment(data []byte) (Comment, error) {
 	var r Comment
 	err := json.Unmarshal(data, &r)
@@ -94,7 +92,7 @@ type Comment struct {
 }
 
 type Datum struct {
-	ID         *int64      `json:"id,omitempty"`
+	ID         *int        `json:"id,omitempty"`
 	Channel    *Channel    `json:"channel,omitempty"`
 	User       *User       `json:"user,omitempty"`
 	Support    interface{} `json:"support"`
@@ -104,7 +102,7 @@ type Datum struct {
 	Image      *string     `json:"image,omitempty"`
 	BgColor    *string     `json:"bgColor,omitempty"`
 	CreatedAt  *string     `json:"createdAt,omitempty"`
-	ReplyCount *int64      `json:"replyCount,omitempty"`
+	ReplyCount *int        `json:"replyCount,omitempty"`
 	Episode    *Channel    `json:"episode,omitempty"`
 	CanBlind   *bool       `json:"canBlind,omitempty"`
 	CanDelete  *bool       `json:"canDelete,omitempty"`
@@ -117,7 +115,7 @@ type Channel struct {
 }
 
 type User struct {
-	ID           *int64  `json:"id,omitempty"`
+	ID           *int    `json:"id,omitempty"`
 	Picture      *string `json:"picture,omitempty"`
 	PictureColor *string `json:"pictureColor,omitempty"`
 	Nickname     *string `json:"nickname,omitempty"`
@@ -125,7 +123,7 @@ type User struct {
 }
 
 type Summary struct {
-	TotalCount *int64 `json:"totalCount,omitempty"`
+	TotalCount *int `json:"totalCount,omitempty"`
 }
 
 type Report struct {

@@ -8,19 +8,21 @@ import (
 	"strings"
 	"time"
 
-	"github.com/PuerkitoBio/goquery"
 	"github.com/ashwanthkumar/slack-go-webhook"
 	"github.com/robfig/cron"
 	"github.com/valyala/fasthttp"
 )
 
+var (
+	webhookURL = getEnvVar("slack", "")
+)
+
 func main() {
 	c := cron.New()
-
+	fmt.Println("set webhook url is:")
+	fmt.Println(webhookURL)
 	c.AddJob("@every 30s", diff{})
-
 	c.Start()
-
 	for {
 		time.Sleep(time.Second)
 	}
@@ -30,96 +32,54 @@ type diff struct {
 }
 
 func (f diff) Run() {
-
-	doc, err := goquery.NewDocument("http://www.podbbang.com/ch/1771386")
+	res := doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
+	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
-		log.Fatal(err)
-		return
+		Slack("파싱에 문제가 발생했습니다.")
 	}
-	pl := doc.Find("dl.likes dd").Text()
-	ps := doc.Find("dl.subscribes dd").Text()
-	pls := strings.Split(pl, "{{")
-	pss := strings.Split(ps, "{{")
-	fmt.Println("pre like:", pls[0])
-	fmt.Println("pre sub:", pss[0])
-	if pls[0] == "0" {
-		return
-	}
-	if pss[0] == "0" {
-		return
-	}
-	if pls[0] == "" {
-		return
-	}
-	if pss[0] == "" {
-		return
-	}
+	plc := s.Channels.Data[0].LikeCount
+	psc := s.Channels.Data[0].SubscribeCount
+
+	fmt.Println("pre like count: ", *plc)
+	fmt.Println("pre subscribe count: ", *psc)
 	time.Sleep(time.Second * 31)
-	doc, err = goquery.NewDocument("http://www.podbbang.com/ch/1771386")
+
+	res = doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
+	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
-		log.Fatal(err)
-		return
+		Slack("파싱에 문제가 발생했습니다.")
 	}
-	nl := doc.Find("dl.likes dd").Text()
-	ns := doc.Find("dl.subscribes dd").Text()
-	nls := strings.Split(nl, "{{")
-	nss := strings.Split(ns, "{{")
-	fmt.Println("pre like:", nls[0])
-	fmt.Println("pre sub:", nss[0])
+	lc := s.Channels.Data[0].LikeCount
+	sc := s.Channels.Data[0].SubscribeCount
 
-	if nls[0] == "0" {
-		return
-	}
-	if nss[0] == "0" {
-		return
-	}
-	if nls[0] == "" {
-		return
-	}
-	if nss[0] == "" {
-		return
-	}
+	fmt.Println("pre like count: ", *lc)
+	fmt.Println("pre subscribe count: ", *sc)
 
-
-	if pls[0] != nls[0] {
-		SlackLike("좋아요 수가 달라졌습니다.", pls[0]+"->"+nls[0])
-		fmt.Println("diff!")
+	if *plc != *lc {
+		SlackLike("좋아요 수에 변경이 발생했습니다.", lc)
+		fmt.Println("like count diff!")
 	} else {
-		fmt.Println("no diff like")
+		fmt.Println("like count no diff")
 	}
-	if pss[0] != nss[0] {
-		SlackLike("구독 수가 달라졌습니다.", pss[0]+"->"+nss[0])
-		fmt.Println("diff!")
-	} else {
-		fmt.Println("no diff sub")
-	}
-}
 
-func UnmarshalReply(data []byte) (Reply, error) {
-	var r Reply
-	err := json.Unmarshal(data, &r)
-	return r, err
+	if *psc != *sc {
+		SlackSub("구독 수에 변경이 발생했습니다.", sc)
+		fmt.Println("like count diff!")
+	} else {
+		fmt.Println("like count no diff")
+	}
 }
 
 func doRequest(url string) []byte {
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
-	defer fasthttp.ReleaseRequest(req)   // <- do not forget to release
-	defer fasthttp.ReleaseResponse(resp) // <- do not forget to release
+	defer fasthttp.ReleaseRequest(req)
+	defer fasthttp.ReleaseResponse(resp)
 
 	req.SetRequestURI(url)
 
 	fasthttp.Do(req, resp)
-
 	return resp.Body()
-}
-
-type Reply struct {
-	Summary Summary `json:"summary"`
-}
-
-type Summary struct {
-	TotalCount int64 `json:"total_count"`
 }
 
 type Report struct {
@@ -140,16 +100,56 @@ func (r *Report) Send() {
 	}
 }
 
-func SlackLike(text string, like string) {
+func Slack(text string) {
 	nw := Report{Text: text}
-	nw.Attachment.
-		AddField(slack.Field{Title: "좋아요", Value: like})
 	nw.Send()
 }
 
-func SlackSub(text string, sub string) {
+func SlackLike(text string, like *int) {
 	nw := Report{Text: text}
 	nw.Attachment.
-		AddField(slack.Field{Title: "구독", Value: sub})
+		AddField(slack.Field{Title: "좋아요", Value: fmt.Sprintf("%v", *like)})
 	nw.Send()
+}
+
+func SlackSub(text string, sub *int) {
+	nw := Report{Text: text}
+	nw.Attachment.
+		AddField(slack.Field{Title: "구독", Value: fmt.Sprintf("%v", *sub)})
+	nw.Send()
+}
+
+func UnmarshalChannelInfo(data []byte) (ChannelInfo, error) {
+	var r ChannelInfo
+	err := json.Unmarshal(data, &r)
+	return r, err
+}
+
+func (r *ChannelInfo) Marshal() ([]byte, error) {
+	return json.Marshal(r)
+}
+
+type ChannelInfo struct {
+	Channels *Channels `json:"channels,omitempty"`
+}
+
+type Channels struct {
+	Data    []Datum  `json:"data,omitempty"`
+	Summary *Summary `json:"summary,omitempty"`
+}
+
+type Datum struct {
+	SubscribeCount *int `json:"subscribeCount,omitempty"`
+	LikeCount      *int `json:"likeCount,omitempty"`
+}
+
+type Summary struct {
+	TotalCount *int `json:"totalCount,omitempty"`
+}
+
+func getEnvVar(key, fallbackValue string) string {
+	if val, ok := os.LookupEnv(key); ok {
+		return strings.TrimSpace(val)
+	}
+	return fallbackValue
 }
