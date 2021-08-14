@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: dhreply
-        image: okteto.dev/dhpod:v0.1.8
+        image: okteto.dev/dhpod:v0.1.9
         envFrom:
         - configMapRef:
             name: configs

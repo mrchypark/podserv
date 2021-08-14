@@ -51,7 +51,7 @@ func (f diff) Run() {
 	}
 	spew.Printf("now res: %#v\n", s)
 	fmt.Println("now reply count: ", n)
-	if p != n {
+	if *p != *n {
 		Slack("댓글에 변경이 발생했습니다.")
 		fmt.Println("diff!")
 	} else {
