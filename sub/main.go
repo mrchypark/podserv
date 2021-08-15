@@ -111,8 +111,8 @@ func (r *Report) Send() {
 
 func (s *Slack) report() {
 	nw := Report{Text: s.Text}
-	subr := *s.PreSubscribe - *s.Subscribe
-	liker := *s.PreLike - *s.Like
+	subr := *s.Subscribe - *s.PreSubscribe
+	liker := *s.Like - *s.PreLike
 	sub := fmt.Sprintf("%v", *s.Subscribe) + "(" + fmt.Sprintf("%v", subr) + ")"
 	like := fmt.Sprintf("%v", *s.Like) + "(" + fmt.Sprintf("%v", liker) + ")"
 	nw.Attachment.
