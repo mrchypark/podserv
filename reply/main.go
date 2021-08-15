@@ -32,7 +32,7 @@ type diff struct {
 }
 
 func (f diff) Run() {
-	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
+	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err := UnmarshalComment(res)
 	if err != nil {
 		Slack("파싱에 문제가 발생했습니다.")
@@ -44,7 +44,7 @@ func (f diff) Run() {
 
 	fmt.Println("pre reply count: ", *p)
 	time.Sleep(time.Second * 31)
-	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=1&sort=desc&next=0&playlist_id=0")
+	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalComment(res)
 	if err != nil {
 		Slack("파싱에 문제가 발생했습니다.")
@@ -87,39 +87,40 @@ func (r *Comment) Marshal() ([]byte, error) {
 
 type Comment struct {
 	Data    []Datum  `json:"data,omitempty"`
-	Next    *string  `json:"next,omitempty"`
 	Summary *Summary `json:"summary,omitempty"`
 }
 
 type Datum struct {
-	ID         *int        `json:"id,omitempty"`
-	Channel    *Channel    `json:"channel,omitempty"`
-	User       *User       `json:"user,omitempty"`
-	Support    interface{} `json:"support"`
-	Parent     interface{} `json:"parent"`
-	State      *string     `json:"state,omitempty"`
-	Message    *string     `json:"message,omitempty"`
-	Image      *string     `json:"image,omitempty"`
-	BgColor    *string     `json:"bgColor,omitempty"`
-	CreatedAt  *string     `json:"createdAt,omitempty"`
-	ReplyCount *int        `json:"replyCount,omitempty"`
-	Episode    *Channel    `json:"episode,omitempty"`
-	CanBlind   *bool       `json:"canBlind,omitempty"`
-	CanDelete  *bool       `json:"canDelete,omitempty"`
-	CanEdit    *bool       `json:"canEdit,omitempty"`
-	CanReport  *bool       `json:"canReport,omitempty"`
+	ID            *int     `json:"id"`
+	User          *User    `json:"user"`
+	Support       *Support `json:"support,omitempty"`
+	Parent        *Parent  `json:"parent,omitempty"`
+	Message       *string  `json:"message,omitempty"`
+	CreatedAt     *string  `json:"createdAt,omitempty"`
+	ReplyCount    *int     `json:"replyCount,omitempty"`
+	Episode       *Channel `json:"episode,omitempty"`
+	Replies       []Datum  `json:"replies,omitempty"`
+	UpvoteCount   *int     `json:"upvoteCount,omitempty"`
+	DownvoteCount *int     `json:"downvoteCount,omitempty"`
 }
 
 type Channel struct {
 	ID *int64 `json:"id,omitempty"`
 }
 
+type Parent struct {
+	ID *int `json:"id,omitempty"`
+}
+
+type Support struct {
+	Type *string `json:"type,omitempty"`
+	Cash *int    `json:"cash,omitempty"`
+}
+
 type User struct {
-	ID           *int    `json:"id,omitempty"`
-	Picture      *string `json:"picture,omitempty"`
-	PictureColor *string `json:"pictureColor,omitempty"`
-	Nickname     *string `json:"nickname,omitempty"`
-	Role         *string `json:"role,omitempty"`
+	ID       *int    `json:"id,omitempty"`
+	Nickname *string `json:"nickname,omitempty"`
+	Role     *string `json:"role,omitempty"`
 }
 
 type Summary struct {
