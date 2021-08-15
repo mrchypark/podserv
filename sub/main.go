@@ -46,7 +46,7 @@ func (f diff) Run() {
 
 	fmt.Println("pre like count: ", *plc)
 	fmt.Println("pre subscribe count: ", *psc)
-	time.Sleep(time.Second * 31)
+	time.Sleep(time.Second * 30)
 
 	res = doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err = UnmarshalChannelInfo(res)

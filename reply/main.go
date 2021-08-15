@@ -43,7 +43,7 @@ func (f diff) Run() {
 	}
 
 	fmt.Println("pre reply count: ", *p)
-	time.Sleep(time.Second * 31)
+	time.Sleep(time.Second * 30)
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalComment(res)
 	if err != nil {

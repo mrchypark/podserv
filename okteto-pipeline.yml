@@ -4,6 +4,6 @@ deploy:
   - sed -i "s|<filter_str>|$filter_str|g" ./manifests/configmap.yaml
   - sed -i "s|<pb_key>|$pb_key|g" ./manifests/configmap.yaml
   - okteto build -t okteto.dev/dhpb:v0.1.2 -f pb/Dockerfile ./pb/
-  - okteto build -t okteto.dev/dhpod:v0.2.0 -f reply/Dockerfile ./reply/
-  - okteto build -t okteto.dev/dhsub:v0.2.5 -f sub/Dockerfile ./sub/
+  - okteto build -t okteto.dev/dhpod:v0.2.1 -f reply/Dockerfile ./reply/
+  - okteto build -t okteto.dev/dhsub:v0.2.6 -f sub/Dockerfile ./sub/
   - kubectl apply -f ./manifests/
