@@ -111,8 +111,10 @@ func (r *Report) Send() {
 
 func (s *Slack) report() {
 	nw := Report{Text: s.Text}
-	sub := fmt.Sprintf("%v", *s.Subscribe) + "(" + string(*s.PreSubscribe-*s.Subscribe) + ")"
-	like := fmt.Sprintf("%v", *s.Like) + "(" + string(*s.PreLike-*s.Like) + ")"
+	subr := *s.PreSubscribe - *s.Subscribe
+	liker := *s.PreLike - *s.Like
+	sub := fmt.Sprintf("%v", *s.Subscribe) + "(" + fmt.Sprintf("%v", subr) + ")"
+	like := fmt.Sprintf("%v", *s.Like) + "(" + fmt.Sprintf("%v", liker) + ")"
 	nw.Attachment.
 		AddField(slack.Field{Title: "구독", Value: sub}).
 		AddField(slack.Field{Title: "좋아요", Value: like})
