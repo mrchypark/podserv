@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	webhookURL = getEnvVar("slack", "")
+	webhookURL    = getEnvVar("slack", "")
+	webhookURLerr = getEnvVar("slack_err", "")
 )
 
 func main() {
@@ -35,7 +36,7 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err := UnmarshalComment(res)
 	if err != nil {
-		Slack("파싱에 문제가 발생했습니다.")
+		SlackErr("파싱에 문제가 발생했습니다.")
 	}
 	p := s.Summary.TotalCount
 	if *p == int(0) {
@@ -47,7 +48,7 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalComment(res)
 	if err != nil {
-		Slack("파싱에 문제가 발생했습니다.")
+		SlackErr("파싱에 문제가 발생했습니다.")
 	}
 	n := s.Summary.TotalCount
 	if *n == int(0) {
@@ -132,13 +133,13 @@ type Report struct {
 	Attachment slack.Attachment
 }
 
-func (r *Report) Send() {
+func (r *Report) Send(url string) {
 	payload := slack.Payload{
 		Text:        r.Text,
 		Attachments: []slack.Attachment{r.Attachment},
 	}
 
-	err := slack.Send(webhookURL, "", payload)
+	err := slack.Send(url, "", payload)
 	if len(err) > 0 {
 		log.Printf("error: %s\n", err)
 	}
@@ -146,7 +147,12 @@ func (r *Report) Send() {
 
 func Slack(text string) {
 	nw := Report{Text: text}
-	nw.Send()
+	nw.Send(webhookURL)
+}
+
+func SlackErr(text string) {
+	nw := Report{Text: text}
+	nw.Send(webhookURLerr)
 }
 
 func getEnvVar(key, fallbackValue string) string {

@@ -14,7 +14,8 @@ import (
 )
 
 var (
-	webhookURL = getEnvVar("slack", "")
+	webhookURL    = getEnvVar("slack", "")
+	webhookURLerr = getEnvVar("slack_err", "")
 )
 
 func main() {
@@ -96,14 +97,13 @@ type Report struct {
 	Attachment slack.Attachment
 }
 
-func (r *Report) Send() {
-	webhookURL := os.Getenv("slack")
+func (r *Report) Send(url string) {
 	payload := slack.Payload{
 		Text:        r.Text,
 		Attachments: []slack.Attachment{r.Attachment},
 	}
 
-	err := slack.Send(webhookURL, "", payload)
+	err := slack.Send(url, "", payload)
 	if len(err) > 0 {
 		log.Printf("error: %s\n", err)
 	}
@@ -118,14 +118,14 @@ func (s *Slack) report() {
 	nw.Attachment.
 		AddField(slack.Field{Title: "구독", Value: sub}).
 		AddField(slack.Field{Title: "좋아요", Value: like})
-	nw.Send()
+	nw.Send(webhookURL)
 }
 
 func (s *Slack) errReport() {
 	nw := Report{Text: s.Text}
 	nw.Attachment.
 		AddField(slack.Field{Title: "api 응답", Value: s.Rawbody})
-	nw.Send()
+	nw.Send(webhookURLerr)
 }
 
 type Slack struct {
