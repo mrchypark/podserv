@@ -40,3 +40,9 @@ func Test_diffMessage(t *testing.T) {
 
 	assert.Equal(t, "", changelog, "they should be equal")
 }
+
+func Test_Retry(t *testing.T) {
+	res := doRequest("http://httpbin.org/status/502")
+
+	assert.Equal(t, "", res, "they should be equal")
+}

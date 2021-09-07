@@ -3,13 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
 
 	"github.com/ashwanthkumar/slack-go-webhook"
 	"github.com/robfig/cron/v3"
+	"github.com/rs/zerolog/log"
 	"github.com/valyala/fasthttp"
 )
 
@@ -65,14 +65,20 @@ func (f diff) Run() {
 }
 
 func doRequest(url string) []byte {
+	try := 0
 	req := fasthttp.AcquireRequest()
 	resp := fasthttp.AcquireResponse()
 	defer fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(resp)
 
 	req.SetRequestURI(url)
+	resp.Header.SetStatusCode(502)
 
-	fasthttp.Do(req, resp)
+	for resp.Header.StatusCode() == 502 && try < 5 {
+		time.Sleep(time.Second * 2)
+		fasthttp.Do(req, resp)
+		try += 1
+	}
 	return resp.Body()
 }
 
