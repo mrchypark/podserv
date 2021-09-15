@@ -57,8 +57,7 @@ func (f diff) Run() {
 
 	fmt.Println("now reply count: ", *n)
 	if *p != *n {
-		Slack("댓글에 변경이 발생했습니다.
-			<https://www.podbbang.com/creatorstudio/1771386/broadcast/comment_list>")
+		Slack("댓글에 변경이 발생했습니다.\n<https://www.podbbang.com/creatorstudio/1771386/broadcast/comment_list>")
 		fmt.Println("diff!")
 	} else {
 		fmt.Println("no diff")
