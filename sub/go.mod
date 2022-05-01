@@ -9,7 +9,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/robfig/cron v1.2.0
 	github.com/smartystreets/goconvey v1.6.4 // indirect
-	github.com/stretchr/testify v1.7.0
-	github.com/valyala/fasthttp v1.16.0
+	github.com/valyala/fasthttp v1.34.0
 	moul.io/http2curl v1.0.0 // indirect
 )
