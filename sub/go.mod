@@ -1,6 +1,6 @@
 module sub
 
-go 1.15
+go 1.17
 
 require (
 	github.com/ashwanthkumar/slack-go-webhook v0.0.0-20200209025033-430dd4e66960
