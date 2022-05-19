@@ -33,29 +33,32 @@ type diff struct {
 
 func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
+	fmt.Printf("return:\t %v \n", string(res))
 	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
 		fmt.Printf("err!!: %s\n", err)
+		return
 	}
 	p := s.Summary.TotalCount
-	if *p == int(0) {
+	if p == int(0) {
 		return
 	}
 
-	fmt.Println("pre reply count: ", *p)
+	fmt.Println("pre reply count: ", p)
 	time.Sleep(time.Second * 30)
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
 		fmt.Printf("err!!: %s\n", err)
+		return
 	}
 	n := s.Summary.TotalCount
-	if *n == int(0) {
+	if n == int(0) {
 		return
 	}
 
-	fmt.Println("now reply count: ", *n)
-	if *p != *n {
+	fmt.Println("now reply count: ", n)
+	if p != n {
 		Send("댓글에 변경이 발생했습니다.\n<https://www.podbbang.com/creatorstudio/1771386/broadcast/comment_list>")
 		fmt.Println("diff!")
 	} else {
@@ -77,6 +80,7 @@ func doRequest(url string) []byte {
 	defer fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(resp)
 
+	req.Header.Add("User-Agent", "podserv")
 	req.SetRequestURI(url)
 	resp.Header.SetStatusCode(502)
 
@@ -103,7 +107,7 @@ type ChannelInfo struct {
 }
 
 type Summary struct {
-	TotalCount int64 `json:"totalCount"`
+	TotalCount int `json:"totalCount"`
 }
 
 func getEnvVar(key, fallbackValue string) string {

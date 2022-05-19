@@ -79,6 +79,7 @@ func doRequest(url string) []byte {
 	defer fasthttp.ReleaseRequest(req)
 	defer fasthttp.ReleaseResponse(resp)
 
+	req.Header.Add("User-Agent", "podserv")
 	req.SetRequestURI(url)
 	resp.Header.SetStatusCode(502)
 
