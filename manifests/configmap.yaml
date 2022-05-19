@@ -1,8 +1,9 @@
 apiVersion: v1
 data:
-  slack: <slack>
-  slack_money: <slack_money>
-  slack_err: <slack_err>
+  message_webhook_id: <message_webhook_id>
+  message_webhook_token: <message_webhook_token>
+  donation_webhook_id: <donation_webhook_id>
+  donation_webhook_token: <donation_webhook_token>
   filter_str: <filter_str>
   pb_key: <pb_key>
 kind: ConfigMap
