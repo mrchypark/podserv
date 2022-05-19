@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,14 +11,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ashwanthkumar/slack-go-webhook"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/webhook"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/fasthttp/websocket"
 )
 
-func main() {
+var (
+	dnID    = snowflake.GetEnv("donation_webhook_id")
+	dnToken = getEnvVar("donation_webhook_token", "")
+)
 
+func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
+
+	dnclt := webhook.NewClient(dnID, dnToken)
+	defer dnclt.Close(context.TODO())
 
 	key := os.Getenv("pb_key")
 	str := os.Getenv("filter_str")
@@ -43,10 +53,15 @@ func main() {
 			}
 			n, _ := UnmarshalNoti(message)
 			if n.Type == "push" && strings.Contains(n.Push.Body, str) {
-				fmt.Println("app: ", n.Push.ApplicationName)
 				fmt.Println("title: ", n.Push.Title)
+				fmt.Println("app: ", n.Push.ApplicationName)
 				fmt.Println("body: ", n.Push.Body)
-				Slack("알람이 왔습니다.", n)
+				var ems = []discord.Embed{
+					discord.NewEmbedBuilder().SetTitle("title").SetDescription(n.Push.Title).Build(),
+					discord.NewEmbedBuilder().SetTitle("app").SetDescription(n.Push.ApplicationName).Build(),
+					discord.NewEmbedBuilder().SetTitle("body").SetDescription(n.Push.Body).Build(),
+				}
+				dnclt.CreateEmbeds(ems)
 			}
 		}
 	}()
@@ -67,8 +82,6 @@ func main() {
 		case <-interrupt:
 			fmt.Println("interrupt")
 
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
 			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
 			if err != nil {
 				fmt.Println("write close:", err)
@@ -110,29 +123,9 @@ type Push struct {
 	NotificationTag  string `json:"notification_tag"`
 }
 
-type Report struct {
-	Text       string
-	Attachment slack.Attachment
-}
-
-func (r *Report) Send() {
-	webhookURL := os.Getenv("slack_money")
-	payload := slack.Payload{
-		Text:        r.Text,
-		Attachments: []slack.Attachment{r.Attachment},
+func getEnvVar(key, fallbackValue string) string {
+	if val, ok := os.LookupEnv(key); ok {
+		return strings.TrimSpace(val)
 	}
-
-	err := slack.Send(webhookURL, "", payload)
-	if len(err) > 0 {
-		log.Printf("error: %s\n", err)
-	}
-}
-
-func Slack(text string, n Noti) {
-	nw := Report{Text: text}
-	nw.Attachment.
-		AddField(slack.Field{Title: "Title", Value: n.Push.Title}).
-		AddField(slack.Field{Title: "App", Value: n.Push.ApplicationName}).
-		AddField(slack.Field{Title: "Body", Value: n.Push.Body})
-	nw.Send()
+	return fallbackValue
 }

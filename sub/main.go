@@ -1,27 +1,27 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/ashwanthkumar/slack-go-webhook"
+	"github.com/disgoorg/disgo/discord"
+	"github.com/disgoorg/disgo/webhook"
+	"github.com/disgoorg/snowflake/v2"
 	"github.com/robfig/cron"
 	"github.com/valyala/fasthttp"
 )
 
 var (
-	webhookURL    = getEnvVar("slack", "")
-	webhookURLerr = getEnvVar("slack_err", "")
+	msgID    = snowflake.GetEnv("message_webhook_id")
+	msgToken = getEnvVar("message_webhook_token", "")
 )
 
 func main() {
 	c := cron.New()
-	fmt.Println("set webhook url is:")
-	fmt.Println(webhookURL)
 	c.AddJob("@every 30s", diff{})
 	c.Start()
 	for {
@@ -36,11 +36,7 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
-		pd := Slack{
-			Text:    "파싱에 문제가 발생했습니다.",
-			Rawbody: string(res),
-		}
-		pd.errReport()
+
 	}
 	plc := s.Channels.Data[0].LikeCount
 	psc := s.Channels.Data[0].SubscribeCount
@@ -52,11 +48,7 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
-		pd := Slack{
-			Text:    "파싱에 문제가 발생했습니다.",
-			Rawbody: string(res),
-		}
-		pd.errReport()
+
 	}
 	lc := s.Channels.Data[0].LikeCount
 	sc := s.Channels.Data[0].SubscribeCount
@@ -64,7 +56,7 @@ func (f diff) Run() {
 	fmt.Println("pre like count: ", *lc)
 	fmt.Println("pre subscribe count: ", *sc)
 
-	pd := Slack{
+	pd := rpClient{
 		Text:         "팟빵에 변경이 발생했습니다.",
 		PreLike:      plc,
 		Like:         lc,
@@ -98,49 +90,29 @@ func doRequest(url string) []byte {
 	return resp.Body()
 }
 
-type Report struct {
-	Text       string
-	Attachment slack.Attachment
-}
+func (s *rpClient) report() {
+	msgclt := webhook.NewClient(msgID, msgToken)
+	defer msgclt.Close(context.TODO())
 
-func (r *Report) Send(url string) {
-	payload := slack.Payload{
-		Text:        r.Text,
-		Attachments: []slack.Attachment{r.Attachment},
-	}
-
-	err := slack.Send(url, "", payload)
-	if len(err) > 0 {
-		log.Printf("error: %s\n", err)
-	}
-}
-
-func (s *Slack) report() {
-	nw := Report{Text: s.Text}
 	subr := *s.Subscribe - *s.PreSubscribe
 	liker := *s.Like - *s.PreLike
 	sub := fmt.Sprintf("%v", *s.Subscribe) + "(" + fmt.Sprintf("%v", subr) + ")"
 	like := fmt.Sprintf("%v", *s.Like) + "(" + fmt.Sprintf("%v", liker) + ")"
-	nw.Attachment.
-		AddField(slack.Field{Title: "구독", Value: sub}).
-		AddField(slack.Field{Title: "좋아요", Value: like})
-	nw.Send(webhookURL)
+
+	msgclt.CreateContent(s.Text)
+	var ems = []discord.Embed{
+		discord.NewEmbedBuilder().SetTitle("구독").SetDescription(sub).Build(),
+		discord.NewEmbedBuilder().SetTitle("좋아요").SetDescription(like).Build(),
+	}
+	msgclt.CreateEmbeds(ems)
 }
 
-func (s *Slack) errReport() {
-	nw := Report{Text: s.Text}
-	nw.Attachment.
-		AddField(slack.Field{Title: "api 응답", Value: s.Rawbody})
-	nw.Send(webhookURLerr)
-}
-
-type Slack struct {
+type rpClient struct {
 	Text         string
 	PreLike      *int
 	Like         *int
 	PreSubscribe *int
 	Subscribe    *int
-	Rawbody      string
 }
 
 func UnmarshalChannelInfo(data []byte) (ChannelInfo, error) {

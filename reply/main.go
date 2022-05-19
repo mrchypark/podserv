@@ -1,27 +1,26 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 	"time"
 
-	"github.com/ashwanthkumar/slack-go-webhook"
-	"github.com/robfig/cron/v3"
-	"github.com/rs/zerolog/log"
+	"github.com/disgoorg/disgo/webhook"
+	"github.com/disgoorg/snowflake/v2"
+	"github.com/robfig/cron"
 	"github.com/valyala/fasthttp"
 )
 
 var (
-	webhookURL    = getEnvVar("slack", "")
-	webhookURLerr = getEnvVar("slack_err", "")
+	msgID    = snowflake.GetEnv("message_webhook_id")
+	msgToken = getEnvVar("message_webhook_token", "")
 )
 
 func main() {
 	c := cron.New()
-	fmt.Println("set webhook url is:")
-	fmt.Println(webhookURL)
 	c.AddJob("@every 30s", diff{})
 	c.Start()
 	for {
@@ -36,7 +35,7 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err := UnmarshalComment(res)
 	if err != nil {
-		SlackErr("파싱에 문제가 발생했습니다.")
+
 	}
 	p := s.Summary.TotalCount
 	if *p == int(0) {
@@ -48,7 +47,7 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalComment(res)
 	if err != nil {
-		SlackErr("파싱에 문제가 발생했습니다.")
+
 	}
 	n := s.Summary.TotalCount
 	if *n == int(0) {
@@ -57,11 +56,18 @@ func (f diff) Run() {
 
 	fmt.Println("now reply count: ", *n)
 	if *p != *n {
-		Slack("댓글에 변경이 발생했습니다.\n<https://www.podbbang.com/creatorstudio/1771386/broadcast/comment_list>")
+		Send("댓글에 변경이 발생했습니다.\n<https://www.podbbang.com/creatorstudio/1771386/broadcast/comment_list>")
 		fmt.Println("diff!")
 	} else {
 		fmt.Println("no diff")
 	}
+}
+
+func Send(msg string) {
+	dnclt := webhook.NewClient(msgID, msgToken)
+	defer dnclt.Close(context.TODO())
+
+	dnclt.CreateContent(msg)
 }
 
 func doRequest(url string) []byte {
@@ -132,33 +138,6 @@ type User struct {
 
 type Summary struct {
 	TotalCount *int `json:"totalCount,omitempty"`
-}
-
-type Report struct {
-	Text       string
-	Attachment slack.Attachment
-}
-
-func (r *Report) Send(url string) {
-	payload := slack.Payload{
-		Text:        r.Text,
-		Attachments: []slack.Attachment{r.Attachment},
-	}
-
-	err := slack.Send(url, "", payload)
-	if len(err) > 0 {
-		log.Printf("error: %s\n", err)
-	}
-}
-
-func Slack(text string) {
-	nw := Report{Text: text}
-	nw.Send(webhookURL)
-}
-
-func SlackErr(text string) {
-	nw := Report{Text: text}
-	nw.Send(webhookURLerr)
 }
 
 func getEnvVar(key, fallbackValue string) string {

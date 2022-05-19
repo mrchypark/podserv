@@ -1,10 +1,11 @@
 deploy:
-  - sed -i "s|<slack>|$slack|g" ./manifests/configmap.yaml
-  - sed -i "s|<slack_err>|$slack_err|g" ./manifests/configmap.yaml
-  - sed -i "s|<slack_money>|$slack_money|g" ./manifests/configmap.yaml
   - sed -i "s|<filter_str>|$filter_str|g" ./manifests/configmap.yaml
   - sed -i "s|<pb_key>|$pb_key|g" ./manifests/configmap.yaml
-  - okteto build -t okteto.dev/dhpb:v0.1.3 -f pb/Dockerfile ./pb/
-  - okteto build -t okteto.dev/dhpod:v0.2.6 -f reply/Dockerfile ./reply/
-  - okteto build -t okteto.dev/dhsub:v0.2.9 -f sub/Dockerfile ./sub/
+  - sed -i "s|<message_webhook_id>|$message_webhook_id|g" ./manifests/configmap.yaml
+  - sed -i "s|<message_webhook_token>|$message_webhook_token|g" ./manifests/configmap.yaml
+  - sed -i "s|<donation_webhook_id>|$donation_webhook_id|g" ./manifests/configmap.yaml
+  - sed -i "s|<donation_webhook_token>|$donation_webhook_token|g" ./manifests/configmap.yaml
+  - okteto build -t okteto.dev/dhpb:v0.3.0 -f pb/Dockerfile ./pb/
+  - okteto build -t okteto.dev/dhreply:v0.3.0 -f reply/Dockerfile ./reply/
+  - okteto build -t okteto.dev/dhsub:v0.3.0 -f sub/Dockerfile ./sub/
   - kubectl apply -f ./manifests/
