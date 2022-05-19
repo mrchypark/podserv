@@ -36,7 +36,8 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
-
+		fmt.Printf("err!!: %s\n", err)
+		return
 	}
 	plc := s.Channels.Data[0].LikeCount
 	psc := s.Channels.Data[0].SubscribeCount
@@ -48,7 +49,8 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/search-content?keyword=%EB%8D%B0%EC%9D%B4%ED%84%B0%ED%99%80%EB%A6%AD&offset=0&limit=3")
 	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
-
+		fmt.Printf("err!!: %s\n", err)
+		return
 	}
 	lc := s.Channels.Data[0].LikeCount
 	sc := s.Channels.Data[0].SubscribeCount
