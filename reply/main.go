@@ -35,7 +35,7 @@ func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err := UnmarshalComment(res)
 	if err != nil {
-
+		fmt.Printf("err!!: %s\n", err)
 	}
 	p := s.Summary.TotalCount
 	if *p == int(0) {
@@ -47,7 +47,7 @@ func (f diff) Run() {
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
 	s, err = UnmarshalComment(res)
 	if err != nil {
-
+		fmt.Printf("err!!: %s\n", err)
 	}
 	n := s.Summary.TotalCount
 	if *n == int(0) {
