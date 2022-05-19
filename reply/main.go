@@ -33,7 +33,7 @@ type diff struct {
 
 func (f diff) Run() {
 	res := doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
-	s, err := UnmarshalComment(res)
+	s, err := UnmarshalChannelInfo(res)
 	if err != nil {
 		fmt.Printf("err!!: %s\n", err)
 	}
@@ -45,7 +45,7 @@ func (f diff) Run() {
 	fmt.Println("pre reply count: ", *p)
 	time.Sleep(time.Second * 30)
 	res = doRequest("https://app-api6.podbbang.com/channels/1771386/comments?limit=10000&sort=desc&with=replies,votes,playlist,episode&next=0")
-	s, err = UnmarshalComment(res)
+	s, err = UnmarshalChannelInfo(res)
 	if err != nil {
 		fmt.Printf("err!!: %s\n", err)
 	}
@@ -87,57 +87,23 @@ func doRequest(url string) []byte {
 	}
 	return resp.Body()
 }
-
-func UnmarshalComment(data []byte) (Comment, error) {
-	var r Comment
+func UnmarshalChannelInfo(data []byte) (ChannelInfo, error) {
+	var r ChannelInfo
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *Comment) Marshal() ([]byte, error) {
+func (r *ChannelInfo) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-type Comment struct {
-	Data    []Datum  `json:"data,omitempty"`
-	Summary *Summary `json:"summary,omitempty"`
-}
-
-type Datum struct {
-	ID            *int     `json:"id"`
-	User          *User    `json:"user"`
-	Support       *Support `json:"support,omitempty"`
-	Parent        *Parent  `json:"parent,omitempty"`
-	Message       *string  `json:"message,omitempty"`
-	CreatedAt     *string  `json:"createdAt,omitempty"`
-	ReplyCount    *int     `json:"replyCount,omitempty"`
-	Episode       *Channel `json:"episode,omitempty"`
-	Replies       []Datum  `json:"replies,omitempty"`
-	UpvoteCount   *int     `json:"upvoteCount,omitempty"`
-	DownvoteCount *int     `json:"downvoteCount,omitempty"`
-}
-
-type Channel struct {
-	ID *int64 `json:"id,omitempty"`
-}
-
-type Parent struct {
-	ID *int `json:"id,omitempty"`
-}
-
-type Support struct {
-	Type *string `json:"type,omitempty"`
-	Cash *int    `json:"cash,omitempty"`
-}
-
-type User struct {
-	ID       *int    `json:"id,omitempty"`
-	Nickname *string `json:"nickname,omitempty"`
-	Role     *string `json:"role,omitempty"`
+type ChannelInfo struct {
+	Next    string  `json:"next"`
+	Summary Summary `json:"summary"`
 }
 
 type Summary struct {
-	TotalCount *int `json:"totalCount,omitempty"`
+	TotalCount int64 `json:"totalCount"`
 }
 
 func getEnvVar(key, fallbackValue string) string {
