@@ -102,10 +102,12 @@ func (s *rpClient) report() {
 	sub := fmt.Sprintf("%v", *s.Subscribe) + "(" + fmt.Sprintf("%v", subr) + ")"
 	like := fmt.Sprintf("%v", *s.Like) + "(" + fmt.Sprintf("%v", liker) + ")"
 
-	msgclt.CreateContent(s.Text)
 	var ems = []discord.Embed{
-		discord.NewEmbedBuilder().SetTitle("구독").SetDescription(sub).Build(),
-		discord.NewEmbedBuilder().SetTitle("좋아요").SetDescription(like).Build(),
+		discord.NewEmbedBuilder().
+			SetTitle(s.Text).
+			SetField(0, "구독", sub, true).
+			SetField(1, "좋아요", like, true).
+			Build(),
 	}
 	msgclt.CreateEmbeds(ems)
 }

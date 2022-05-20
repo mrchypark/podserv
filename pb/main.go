@@ -57,9 +57,10 @@ func main() {
 				fmt.Println("app: ", n.Push.ApplicationName)
 				fmt.Println("body: ", n.Push.Body)
 				var ems = []discord.Embed{
-					discord.NewEmbedBuilder().SetTitle("title").SetDescription(n.Push.Title).Build(),
-					discord.NewEmbedBuilder().SetTitle("app").SetDescription(n.Push.ApplicationName).Build(),
-					discord.NewEmbedBuilder().SetTitle("body").SetDescription(n.Push.Body).Build(),
+					discord.NewEmbedBuilder().
+						SetTitle(n.Push.Title).
+						SetField(0, n.Push.ApplicationName, n.Push.Body, true).
+						Build(),
 				}
 				dnclt.CreateEmbeds(ems)
 			}
