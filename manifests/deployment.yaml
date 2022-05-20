@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: dhpb
-        image: okteto.dev/dhpb:v0.3.3
+        image: okteto.dev/dhpb:v0.3.4
         envFrom:
         - configMapRef:
             name: configs
@@ -35,7 +35,7 @@ spec:
     spec:
       containers:
       - name: dhreply
-        image: okteto.dev/dhreply:v0.3.3
+        image: okteto.dev/dhreply:v0.3.4
         envFrom:
         - configMapRef:
             name: configs
@@ -56,7 +56,7 @@ spec:
     spec:
       containers:
       - name: dhsub
-        image: okteto.dev/dhsub:v0.3.3
+        image: okteto.dev/dhsub:v0.3.4
         envFrom:
         - configMapRef:
             name: configs
