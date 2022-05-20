@@ -6,8 +6,8 @@ deploy:
   - sed -i "s|<donation_webhook_id>|$donation_webhook_id|g" ./manifests/configmap.yaml
   - sed -i "s|<donation_webhook_token>|$donation_webhook_token|g" ./manifests/configmap.yaml
   - cat ./manifests/configmap.yaml
-  - okteto build -t okteto.dev/dhpb:v0.3.2 -f pb/Dockerfile ./pb/
-  - okteto build -t okteto.dev/dhreply:v0.3.2 -f reply/Dockerfile ./reply/
-  - okteto build -t okteto.dev/dhsub:v0.3.2 -f sub/Dockerfile ./sub/
+  - okteto build -t okteto.dev/dhpb:v0.3.3 -f pb/Dockerfile ./pb/
+  - okteto build -t okteto.dev/dhreply:v0.3.3 -f reply/Dockerfile ./reply/
+  - okteto build -t okteto.dev/dhsub:v0.3.3 -f sub/Dockerfile ./sub/
   - kubectl apply -f ./manifests/configmap.yaml
   - kubectl apply -f ./manifests/deployment.yaml

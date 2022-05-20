@@ -105,8 +105,8 @@ func (s *rpClient) report() {
 	var ems = []discord.Embed{
 		discord.NewEmbedBuilder().
 			SetTitle(s.Text).
-			SetField(0, "구독", sub, true).
-			SetField(1, "좋아요", like, true).
+			AddField("구독", sub, true).
+			AddField("좋아요", like, true).
 			Build(),
 	}
 	msgclt.CreateEmbeds(ems)

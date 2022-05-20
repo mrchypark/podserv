@@ -59,7 +59,7 @@ func main() {
 				var ems = []discord.Embed{
 					discord.NewEmbedBuilder().
 						SetTitle(n.Push.Title).
-						SetField(0, n.Push.ApplicationName, n.Push.Body, true).
+						AddField(n.Push.ApplicationName, n.Push.Body, true).
 						Build(),
 				}
 				dnclt.CreateEmbeds(ems)
