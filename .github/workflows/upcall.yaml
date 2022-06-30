@@ -13,17 +13,17 @@ jobs:
     - name: checkout
       uses: actions/checkout@master
     - name: Login
-      uses: okteto/login@master
+      uses: okteto/login@main
       with:
         token: ${{ secrets.OKTETO_TOKEN }}
         
     - name: "Activate personal namespace"
-      uses: okteto/namespace@master
+      uses: okteto/namespace@main
       with:
         namespace: mrchypark
 
     - name: "Trigger the pipeline"
-      uses: okteto/pipeline@master
+      uses: okteto/pipeline@main
       with:
         name: podserv
 
